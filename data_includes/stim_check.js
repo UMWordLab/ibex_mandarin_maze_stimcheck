@@ -23,26 +23,13 @@ newTrial("nameentry",
     )
 )
 .log("partName", getVar("partName"))
-    
-newTrial("IDentry",
-    newVar("partID").global()
-    ,
-    newText("instr", "请输入您的电邮：").print()
-    ,
-    newHtml("partpage", "<input type='text' id='partID' name='participant email' min='1' max='120'>").print()
-    ,
-    newButton("clickcontinue", "点此继续").print().wait( 
-        getVar("partID").set( v=>$("#partID").val() ).testNot.is('')
-    )
-)
-.log("partID", getVar("partID"))
-            
+               
 // This is run at the beginning of each trial
 Header(
     // Declare a global Var element "ID" in which we will store the participant's ID
-    newVar("partID").global()    
+    newVar("partName").global()    
 )
-.log( "partid" , getVar("partID") ) // Add the ID to all trials' results lines
+.log( "partname" , getVar("partName") ) // Add the ID to all trials' results lines
 
 var showProgressBar =false;
 
@@ -120,56 +107,6 @@ PennController("LexTale_instructions",
   )
   .log( "Subject" , getVar("Subject") )
 
-
-/// Trials
-PennController.Template(
-    PennController.GetTable( "lextale.csv")
-    ,
-    trial => PennController("LexTale_trials",
-        newImage("stimulus", trial.Stimulus)
-            .size(50, 50)
-            .center()
-            .print()
-        ,
-//            newText("stimulus", trial.Stimulus)
-//               .settings.css("font-size", "60px")
-//                .settings.css("font-family", "avenir")
-//                .settings.bold()
-//                .settings.center()
-//                .print()
-//              ,
-        newText("no", "不是汉字")
-            .settings.css("font-size", "40px")
-            .settings.css("font-family", "avenir")
-            .settings.color("red")
-            .settings.bold()
-        ,
-        newText("yes", "是汉字")
-            .settings.css("font-size", "40px")
-            .settings.css("font-family", "avenir")
-            .settings.color("green")
-            .settings.bold()
-
-        ,
-        newCanvas(800, 600)
-            .settings.add( 0,     100,      getText("no"))
-            .settings.add( 500,     100,    getText("yes"))
-            .print()
-        ,
-        newSelector()
-            .settings.add(getText("no") , getText("yes") )
-            .settings.log()
-            .wait()
-    )
-.log( "Stimulus"    , trial.Stimulus    )
-.log( "Type"        , trial.Type        )
-.log( "Block"       , trial.Block       )
-.log( "Subject"         , getVar("Subject")         ) 
-)
-
-// Send results to server
-//PennController.SendResults();
-
 /// Closing text
 newTrial("closing",
     newText("closingText", "All done - thanks!")
@@ -210,26 +147,10 @@ var items = [
 
     ["tech", "Form", { html: { include: "tech.html" } } ],
 
-// ["begin", "PennController",
-//         newTrial(
-//             newVar("partID").global()
-//             ,
-//             newText("Please enter your Prolific ID:")
-//             ,
-//             newHtml("partpage", "<p>blah</p><input type='text' id='partID' name='participant ID' min='1' max='120'>").print()
-//             ,
-//             newButton("Next").print().wait( 
-//                 getVar("partID").set( v=>$("#partID").val() ).testNot.is('')
-//             )
-//         )
-//         .log("partID", getVar("partID"))
-// ],
-
     ["startpractice", Message, {consentRequired: false,
         html: ["div",
             ["p", "您可以先做三组练习"]
             ]}],
-
 //
 //  practice items
 //
@@ -244,7 +165,6 @@ var items = [
 	html: ["div",
 		   ["p", "点此开始主实验"]
 		  ]}],
-
 
 // completion: 
 
