@@ -118,7 +118,7 @@ newTrial("closing",
 
 Template("stimuli.csv", row => {
     items.push(
-        [[row.label, row.item] , "PennController", newTrial(
+        [[row.label, row.label] , "PennController", newTrial(
             newController("Maze", {s: row.sentence, a: row.alternative, redo: true, time:1000, emess: "答案错误", rmess: "请确认您选择最佳的词语延续句子"})
               .print()
               .log()
