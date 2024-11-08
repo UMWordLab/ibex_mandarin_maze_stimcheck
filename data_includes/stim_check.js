@@ -4,10 +4,8 @@ PennController.DebugOff();
 var shuffleSequence = seq("nameentry", 
                         "intro", "setcounter",
                         "starter",
- // trials named _dummy_ will be excluded by following:
-            //            sepWith("sep", rshuffle(startsWith("break"), startsWith("hit"), startsWith("filler"))),
-                        followEachWith("sep",randomize(anyOf(startsWith("rc")))),
- 						"sendresults",
+                         sepWith("sep", randomize(anyOf("stimuli"))),	
+                        "sendresults",
                         "closing"
                 );
 
@@ -84,28 +82,6 @@ function modifyRunningOrder(ro) {
     return new_ro;
   }
   
-// lextale instructions
-
-PennController("LexTale_instructions",
-  defaultText
-  ,
-  newText("LexTale_InstructionText", "您好，这是一个汉字测试。在下一页，您将会看到90个看上去像“汉字”的字，当中只有一些是真正存在的汉字。您需要对每一个字做出判断，如果您认为该字是在中文里存在的（即使您不能够明确地说出该字的意思）或者是您知道该字的话，请点击“是汉字”，如果您认为该字在中文里是不存在的，请点击“不是汉字”。您无需快速回答每一道问题，但请您根据您的第一反应来作答，不用过度的犹豫。请在没有任何外来帮忙的情况下独立完成此测试（不要使用任何汉语词典！）。所有的字皆为简体中文。") 
-  ,
-  newCanvas("myCanvas", 600, 600)
-          .settings.add(0,0, getText("LexTale_InstructionText"))
-          .print()
-  ,              
-  newTextInput("Subject", randomnumber = Math.floor(Math.random()*1000000))             
-  ,
-  newButton("Start")
-      .print()
-      .wait()
-  ,
-  newVar("Subject")
-      .settings.global()
-      .set( getTextInput("Subject") )
-  )
-  .log( "Subject" , getVar("Subject") )
 
 /// Closing text
 newTrial("closing",
@@ -114,24 +90,46 @@ newTrial("closing",
 )
 
 // experimental stimuli:
-// template items will be pushed into native items = [] with fake PC trial _dummy_ output
 
-Template("stimuli.csv", row => {
-    items.push(
-        [[row.label, row.label] , "PennController", newTrial(
-            newController("Maze", {s: row.sentence, a: row.alternative, redo: true, time:1000, emess: "答案错误", rmess: "请确认您选择最佳的词语延续句子"})
-              .print()
-              .log()
-              .wait()
-        )
-        .log("counter", __counter_value_from_server__)
-        .log("label", row.label)
-        .log("item", row.item)
-        .log("list", row.group)
-        ]
-    );
-    return newTrial('_dummy_',null);
-})
+Template("stimuli.csv", row => 
+    newTrial("stimuli",
+                newController("Maze", {s: row.sentence, a: row.alternative, redo: true, time:1000, emess: "答案错误", rmess: "请确认您选择最佳的词语延续句子"}
+                )
+                .print()
+                .log()
+                .wait()
+                .remove()
+                ,
+                newController("Question", {q: "Were the alternatives good?", as: ["Yes", "No"]}
+                )
+                .print()
+                .log()
+                .wait()
+                .remove(),
+                newText("feedback_prompt","Specific comments about this item (" + row.label + "):")
+                .print()
+                ,
+               newText("show_sentence","SENT: " + row.sentence )
+                .print()
+                ,
+               newText("show_alternative","ALT: " + row.alternative )
+                .print()
+                ,
+                newTextInput("feedback", "")
+                    .log()
+                    .lines(0)
+                    .size(400, 100)
+                    .print()
+                ,
+                newButton("submit", "Submit")
+                    .print()
+                    .wait()
+    )
+            .log("counter", __counter_value_from_server__)
+            .log("label", row.label)
+            .log("stimitem", row.item)
+            .log("group", row.group)
+            )
 
 var items = [
 
@@ -151,15 +149,8 @@ var items = [
         html: ["div",
             ["p", "您可以先做三组练习"]
             ]}],
-//
-//  practice items
-//
 
-    [["practice", 801], "Maze", {s:"老板的 手机 在会议中 响了", a:"x-x-x 咱们 氢氧化钠 狐狸"}],
-    [["practice", 802], "Maze", {s:"爸爸 边看 电视 边讲 电话", a:"x-x-x 气孔 避免 腐朽 抓住"}],
-    [["practice", 803], "Maze", {s:"运动员 在健身房 做了 重量 训练", a:"x-x-x 莎士比亚 螳螂 愤怒 爸爸"}],
-
-   // message that the experiment is beginning
+// message that the experiment is beginning
 
    ["starter", Message, {consentRequired: false,
 	html: ["div",
